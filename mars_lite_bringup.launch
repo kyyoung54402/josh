@@ -15,46 +15,16 @@
     </include>
 
     <!-- mars lite robot model -->
-    <!--param name="robot_description" command="$(find xacro)/xacro inorder '$(find mars_lite_description)/urdf/mars_lite.urdf.xacro'"/-->
-    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find mars_lite_description)/urdf/mars_lite_with_gripper.urdf.xacro'"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link" args="0 0 0.1016 0 0 0 base_footprint base_link"/>
-    
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" required="true"> 
-        <param name="rate" value="30"/>
-        <rosparam param="source_list">["tm_joint_states"]</rosparam>
-    </node>
-    
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find tm_description)/urdf/tm700_robot.urdf.xacro'"/>
 
-    <!-- mars lite robot state publisher -->
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
-    
-    <!-- mobile platform launch file -->
-    <include file="$(find mars_lite_mob_plat)/launch/mobile_platform.launch">
-        <arg name="mob_plat_publish_tf" value="$(arg mob_plat_publish_tf)"/>
-        <arg name="output" value="$(arg output)"/>
-    </include>  
 
-    <!-- Gripper-->
-    <include file="$(find robotiq_gripper)/launch/robotiq_gripper.launch">
-        <arg name="speed" value="150"/>
-        <arg name="force" value="100"/>
-        <arg name="dev_path" default="$(env ROBOTIQ_GRIPPER_DEV)"/>
-        <arg name="output" default="$(arg output)"/>
-    </include>
+    <!-- Robot state publisher -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+           <param name="publish_frequency" type="double" value="50.0" />
+           <param name="tf_prefix" type="string" value="" />
+    </node> 
 
-    <!-- Battery State -->
-    <include file="$(find batt_state)/launch/batt_state.launch">
-        <arg name="output" default="$(arg output)"/>
-    </include>
-    
-    <!-- Sensors bringup -->
-    <include file="$(find sensors_bringup)/launch/sensors.launch">
-        <arg name="output" value="$(arg output)"/>
-    </include>
-  
-    <!-- Moveit -->
-    <!-- <include file="$(find mars_lite_moveit_config)/launch/mars_lite_moveit_planning_execution.launch">
-        <arg name="sim" default="false"/>
-    </include> -->
+    <!-- Joint state publisher -->
+    <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller" respawn="false" output="screen"/>
     
 </launch>
